@@ -1,0 +1,50 @@
+﻿@page "/"
+
+@inject GitHubHttpClient GitHubHttpClient;
+
+<PageTitle>Home</PageTitle>
+
+<div class="card">
+    <div class="card-body">
+        <h1 class="card-title">Lector de commits</h1>
+
+        <p class="card-text">Esta aplicación lee los commits de un repositorio de GitHub.</p>
+
+        @* Autor *@
+        <div class="form-group">
+            <label for="autorInput">Introduzca el nombre del autor:</label>
+            <input id="autorInput" type="text" class="form-control" @bind="Autor" />
+        </div>
+
+        @* Repositorio *@
+        <div class="form-group">
+            <label for="repoInput">Repositorio:</label>
+            <input id="repoInput" type="text" class="form-control" @bind="Repo" />
+        </div>
+
+        <button class="btn btn-primary" @onclick="ReadRepo">Leer repositorio</button>
+        @if (CommitList != null)
+        {
+            <ul>
+                @foreach (var commit in CommitList)
+                {
+                    <li>
+                        @commit.Sha.Substring(0,5) - @commit.Message (@commit.LinesChanged lines changed)
+                    </li>
+                }
+            </ul>
+        })
+
+    </div>
+</div>
+
+@code {
+    public List<Commit>? CommitList { get; set; }
+    public string Autor { get; set; } = "enelramon";
+    public string Repo { get; set; } = "Juntos_A_Suerte_Wasm";
+
+    private async Task ReadRepo()
+    {
+        CommitList = await GitHubHttpClient.GetCommits(Autor, Repo);
+    }
+}
